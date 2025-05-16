@@ -4,12 +4,18 @@ node_modules/
 dist/
 .DS_Store
 *.tmp
+v2/
+migrations/
+
+
 
 C:\Users\Ali Hussain Alaswad\Desktop\New\MallHub\MallHub\Front-end\node_modules\
-C:\Users\Ali Hussain Alaswad\Desktop\New\MallHub\MallHub\Back-end\Mall Application\v2
+C:\Users\Ali Hussain Alaswad\Desktop\New\MallHub\MallHub\Back-end\Mall Application\v2\
+v2\
 
 C:\Users\Ali Hussain Alaswad\Desktop\New\MallHub\MallHub\Back-end\Mall Application\Mall\MallAPI\migrations
-
+MallHub/Back-end/Mall Application/Mall/MallAPI/migrations
+MallHub/Front-end/node_modules/
 
 **/migrations/
 **/migrations/*
@@ -116,3 +122,5 @@ Backend/HireHub/recruitment_platform/media
 Backend/HireHub/recruitment_platform/recruitmentAPI/migrations/
 
 .codegpt
+
+MallHub/Back-end/Mall Application/v2/

@@ -1,0 +1,19 @@
+node_modules/
+.env
+*.log
+dist/
+.DS_Store
+*.tmp
+
+C:\Users\Ali Hussain Alaswad\Desktop\New\MallHub\MallHub\Front-end\node_modules\
+C:\Users\Ali Hussain Alaswad\Desktop\New\MallHub\MallHub\Back-end\Mall Application\v2
+
+C:\Users\Ali Hussain Alaswad\Desktop\New\MallHub\MallHub\Back-end\Mall Application\Mall\MallAPI\migrations
+
+
+**/migrations/
+**/migrations/*
+
+/settings.py 
+
+C:\Users\Ali Hussain Alaswad\Desktop\New\MallHub\MallHub\Back-end\Mall Application\Mall\Mall\settings.py

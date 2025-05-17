@@ -305,49 +305,60 @@ class ApplyDiscountView(APIView):
                 serializer = DiscountApplicationSerializer(discount_result)
                 return Response(serializer.data)
             except Exception as loyalty_error:
+                print(f"Loyalty discount error: {str(loyalty_error)}")
                 # If that fails, try as a regular discount code
-                discount = DiscountCodeService.validate_discount_code(discount_code)
-                if discount:
-                    # Create a discount result similar to what loyalty service returns
-                    # We need to calculate the discount based on cart total
-                    from MallAPI.models.cart_model import ShoppingCart
-                    from django.shortcuts import get_object_or_404
-                    
-                    cart = get_object_or_404(ShoppingCart, id=cart_id)
-                    
-                    # Calculate total with store discounts applied where applicable
-                    total_amount = 0
-                    for item in cart.items.all():
-                        if hasattr(item.product, 'store') and item.product.store and item.product.store.discount_percentage > 0:
-                            discount = item.product.price * (Decimal(item.product.store.discount_percentage) / Decimal('100.0'))
-                            discounted_price = round(item.product.price - discount, 2)
-                            total_amount += discounted_price * item.quantity
-                        else:
-                            total_amount += item.product.price * item.quantity
-                    
-                    discount_percentage = Decimal(str(discount.value))  # Convert to Decimal, not float
-                    discount_amount = (total_amount * discount_percentage) / Decimal('100.0')
-                    
-                    # Mark discount code as used
-                    DiscountCodeService.mark_discount_code_as_used(discount_code)
-                    
-                    discount_result = {
-                        'original_amount': total_amount,
-                        'discount_percentage': discount_percentage,
-                        'discount_amount': discount_amount,
-                        'final_amount': total_amount - discount_amount
-                    }
-                    
-                    serializer = DiscountApplicationSerializer(discount_result)
-                    return Response(serializer.data)
-                else:
-                    # If neither system has the code, return error
+                try:
+                    discount = DiscountCodeService.validate_discount_code(discount_code)
+                    if discount:
+                        print(f"Regular discount code validated: {discount_code}, value: {discount.value}, type: {type(discount.value)}")
+                        # Create a discount result similar to what loyalty service returns
+                        # We need to calculate the discount based on cart total
+                        from MallAPI.models.cart_model import ShoppingCart
+                        from django.shortcuts import get_object_or_404
+                        
+                        cart = get_object_or_404(ShoppingCart, id=cart_id)
+                        
+                        # Calculate total with store discounts applied where applicable
+                        total_amount = 0
+                        for item in cart.items.all():
+                            if hasattr(item.product, 'store') and item.product.store and item.product.store.discount_percentage > 0:
+                                store_discount = item.product.price * (Decimal(item.product.store.discount_percentage) / Decimal('100.0'))
+                                discounted_price = round(item.product.price - store_discount, 2)
+                                total_amount += discounted_price * item.quantity
+                            else:
+                                total_amount += item.product.price * item.quantity
+                        
+                        # Use discount.value directly - it's already a Decimal
+                        discount_percentage = discount.value
+                        discount_amount = (total_amount * discount_percentage) / Decimal('100.0')
+                        
+                        # Mark discount code as used
+                        DiscountCodeService.mark_discount_code_as_used(discount_code)
+                        
+                        discount_result = {
+                            'original_amount': total_amount,
+                            'discount_percentage': discount_percentage,
+                            'discount_amount': discount_amount,
+                            'final_amount': total_amount - discount_amount
+                        }
+                        
+                        serializer = DiscountApplicationSerializer(discount_result)
+                        return Response(serializer.data)
+                    else:
+                        # If neither system has the code, return error
+                        return Response(
+                            format_error_message("Invalid or expired discount code"),
+                            status=status.HTTP_400_BAD_REQUEST
+                        )
+                except Exception as discount_error:
+                    print(f"Regular discount error: {str(discount_error)}")
                     return Response(
-                        format_error_message("Invalid or expired discount code"),
+                        format_error_message(f"Error processing discount: {str(discount_error)}"),
                         status=status.HTTP_400_BAD_REQUEST
                     )
                     
         except Exception as e:
+            print(f"General discount application error: {str(e)}")
             return Response(format_error_message(str(e)), status=status.HTTP_400_BAD_REQUEST)
 
 class PointsConversionView(APIView):

@@ -107,9 +107,10 @@ const CartPage = () => {
                 description: `Discount of ${response.data.discount_percentage}% applied`
             });
         } catch (error) {
+            console.error("Error applying discount:", error.response?.data || error.message);
             toast({
                 variant: "destructive",
-                description: "Invalid discount code"
+                description: error.response?.data?.message || "Invalid discount code"
             });
         } finally {
             setIsApplyingDiscount(false);

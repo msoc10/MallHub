@@ -35,10 +35,16 @@ const loyaltyService = {
     },
     
     applyDiscountCode: async (code, cartId) => {
-        return await axios.post('/api/loyalty/checkout/apply-discount/', {
-            discount_code: code,
-            cart_id: cartId
-        });
+        try {
+            const response = await axios.post('/api/loyalty/checkout/apply-discount/', {
+                discount_code: code,
+                cart_id: cartId
+            });
+            return response;
+        } catch (error) {
+            console.error("Discount code application error:", error.response?.data || error.message);
+            throw error;
+        }
     },
     
     getPointsConversion: async () => {
